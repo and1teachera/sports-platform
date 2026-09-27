@@ -96,4 +96,11 @@
 
 ## Architecture
 
-- **Public application.** The client application for readers, reachable without signing in, written in Next.js with React and TypeScript. It renders pages on the server from API responses and holds no business logic and no data access of its own.
+- **Administrative application.** The client application for the Administrator, behind a login and English only, written in Angular with TypeScript. It is a client of the same API as the public application, as [ADR-0004](adr/0004-client-architecture.md) decides.
+- **Bounded context.** A module that owns its own model, its own vocabulary and its own data, and reaches another module only across a defined boundary. Which bounded contexts the application will hold is not yet decided.
+- **Container.** One of the runtime units the system deploys under Docker Compose.
+- **Hexagonal (ports and adapters).** The layering used inside each bounded context: a domain core that depends on nothing outside itself, the ports through which it is driven and through which it asks for what it needs, and the adapters at the edges that implement those ports.
+- **Modular monolith.** One deployable application whose bounded contexts are modules with enforced boundaries rather than separately deployed services, as [ADR-0003](adr/0003-modular-monolith-architecture.md) decides.
+- **Public application.** The client application for readers, reachable without signing in, written in Next.js with React and TypeScript. It renders pages on the server from API responses and holds no business logic and no data access of its own, as [ADR-0004](adr/0004-client-architecture.md) decides.
+- **Quota governor.** The component that holds the request budget for each data provider.
+- **Read model.** The side of the backend that composes what a surface is served, and where spoiler safety lives rather than in any client. A response shared between readers carries outcome-bearing values only for a destination that is itself an explicit ask, while what an individual reader has asked for arrives in a response scoped to them, as [ADR-0004](adr/0004-client-architecture.md) states.

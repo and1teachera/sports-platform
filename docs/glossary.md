@@ -84,6 +84,7 @@
 - **Broken-link report.** A Logged-in user's report that a clip no longer plays.
 - **Highlight.** A video clip of a game, and nothing else.
 - **Highlight issue.** The Administrator's record that a game's highlight type has no working clip.
+- **Re-check.** The periodic check that a stored clip still plays.
 - **Short and extended highlight.** The two highlight types per game: a short clip of a game, and its full highlights.
 - **Trusted channel.** A video platform channel the Administrator lists as trusted.
 
@@ -98,7 +99,7 @@
 
 - **Administrative application.** The client application for the Administrator, behind a login and English only, written in Angular with TypeScript. It is a client of the same API as the public application, as [ADR-0004](adr/0004-client-architecture.md) decides.
 - **Bounded context.** A module that owns its own model, its own vocabulary and its own data, and reaches another module only across a defined boundary. Which bounded contexts the application will hold is not yet decided.
-- **Container.** One of the runtime units the system deploys under Docker Compose.
+- **Container.** One of the runtime units the system deploys under Docker Compose. The [architecture overview](architecture.md) names them and shows how they relate.
 - **Hexagonal (ports and adapters).** The layering used inside each bounded context: a domain core that depends on nothing outside itself, the ports through which it is driven and through which it asks for what it needs, and the adapters at the edges that implement those ports.
 - **Modular monolith.** One deployable application whose bounded contexts are modules with enforced boundaries rather than separately deployed services, as [ADR-0003](adr/0003-modular-monolith-architecture.md) decides.
 - **Public application.** The client application for readers, reachable without signing in, written in Next.js with React and TypeScript. It renders pages on the server from API responses and holds no business logic and no data access of its own, as [ADR-0004](adr/0004-client-architecture.md) decides.

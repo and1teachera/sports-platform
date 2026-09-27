@@ -4,15 +4,21 @@ A spoiler-free sports platform. Its purpose is to let readers access information
 
 > ### Status: no application code
 >
-> This repository holds this README and no application code. The system described here is designed, not built.
+> This repository holds documentation, listed under Documentation below, and no application code. The system described here is designed, not built.
 
 ## Constraints
 
-Three constraints apply to every part of the system and to every decision made about it.
+Three constraints apply to every part of the system and to every decision made about it. The [system description](docs/system-description.md) states them in full.
 
 - **Data costs nothing; hosting is a small fixed cost.** The system operates within the free allowances that external data providers and the video platform offer, and a paid data source is used only by explicit decision. Those allowances are small and fixed, so how often and how much the system requests from them is limited by the allowances, not by reader demand.
 - **Use of media is legally clean.** The system stores a video only if its platform marks it as public and embeddable when it is stored, shows it through that platform's own player, never re-hosts or re-uploads it, and claims no ownership over any provider's data or any creator's video.
 - **One person builds and operates the system.** There is no separate operations role and no second person. Every operational choice must be one that a single person can run alongside building the system.
+
+## Documentation
+
+- [System description](docs/system-description.md): the problem the system addresses, what it is meant to accomplish, the constraints that shape it, who and what interacts with it, where its boundary lies, what it excludes, and the scope of the first version
+
+Further documentation is published with the work that needs it and listed here as it lands.
 
 ## Contributions and support
 

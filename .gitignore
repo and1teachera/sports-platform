@@ -1,0 +1,16 @@
+# Agent and tooling state, never published
+.claude/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

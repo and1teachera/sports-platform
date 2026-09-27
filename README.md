@@ -20,6 +20,11 @@ Three constraints apply to every part of the system and to every decision made a
 - [Phase One scope](docs/phase-one-scope.md): what the first version delivers and what it deliberately leaves out
 - [Requirements](docs/requirements.md): the foundational behaviour the published specification requires, extended as the work that implements more of it is published
 - [Glossary](docs/glossary.md): the meaning each term carries across these documents, and the requirement that owns it where one does
+- Architecture decision records, why the foundational choices were made and what they cost. Each record is published with the work it governs.
+  - [ADR-0001: Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
+  - [ADR-0002: Additive and driving architectural characteristics](docs/adr/0002-additive-and-driving-architectural-characteristics.md)
+  - [ADR-0003: Modular monolith architecture](docs/adr/0003-modular-monolith-architecture.md)
+  - [ADR-0004: Two client applications, chosen against their own constraints](docs/adr/0004-client-architecture.md)
 
 Further documentation is published with the work that needs it and listed here as it lands.
 

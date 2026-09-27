@@ -14,11 +14,30 @@ Three constraints apply to every part of the system and to every decision made a
 - **Use of media is legally clean.** The system stores a video only if its platform marks it as public and embeddable when it is stored, shows it through that platform's own player, never re-hosts or re-uploads it, and claims no ownership over any provider's data or any creator's video.
 - **One person builds and operates the system.** There is no separate operations role and no second person. Every operational choice must be one that a single person can run alongside building the system.
 
+## Architecture and technology
+
+The design is a domain-partitioned modular monolith: bounded contexts as top-level packages, hexagonal (ports and adapters) inside each, with boundaries enforced but not distributed. No context is split into a separately deployable service in the first release. Which bounded contexts the application will hold is not yet decided.
+
+Two client applications will serve the two interactive surfaces, each chosen against its own surface: a public application, reachable without signing in, whose pages render and are cacheable with no session attached to them, and an administrative application that serves the Administrator, one person, behind a login.
+
+| Part | Technology |
+|---|---|
+| Backend | Java with Spring Boot |
+| Database | PostgreSQL |
+| Identity | Keycloak, with OAuth 2.1 and PKCE |
+| Public application | Next.js with React and TypeScript |
+| Administrative application | Angular with TypeScript |
+| Deployment | Docker Compose, with Nginx in front |
+
+The [architecture overview](docs/architecture.md) describes the shape and its containers in full, the [technical decisions](docs/technical-decisions.md) hold the baseline implementation must respect, and two decision records explain the choices: [ADR-0003](docs/adr/0003-modular-monolith-architecture.md) for the modular monolith and [ADR-0004](docs/adr/0004-client-architecture.md) for the two client applications.
+
 ## Documentation
 
 - [System description](docs/system-description.md): the problem the system addresses, what it is meant to accomplish, the constraints that shape it, who and what interacts with it, where its boundary lies, what it excludes, and the scope of the first version
 - [Phase One scope](docs/phase-one-scope.md): what the first version delivers and what it deliberately leaves out
 - [Requirements](docs/requirements.md): the foundational behaviour the published specification requires, extended as the work that implements more of it is published
+- [Technical decisions](docs/technical-decisions.md): the technical baseline that implementation must respect
+- [Architecture overview](docs/architecture.md): how the system is shaped, its context and its containers
 - [Glossary](docs/glossary.md): the meaning each term carries across these documents, and the requirement that owns it where one does
 - Architecture decision records, why the foundational choices were made and what they cost. Each record is published with the work it governs.
   - [ADR-0001: Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)

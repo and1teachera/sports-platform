@@ -17,6 +17,7 @@ Three constraints apply to every part of the system and to every decision made a
 ## Documentation
 
 - [System description](docs/system-description.md): the problem the system addresses, what it is meant to accomplish, the constraints that shape it, who and what interacts with it, where its boundary lies, what it excludes, and the scope of the first version
+- [Requirements](docs/requirements.md): the foundational behaviour the published specification requires, extended as the work that implements more of it is published
 
 Further documentation is published with the work that needs it and listed here as it lands.
 

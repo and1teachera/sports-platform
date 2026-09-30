@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: sports-platform
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/sports_platform}
+    username: ${DATABASE_USER:sports_platform}
+    password: ${DATABASE_PASSWORD:sports_platform}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+server:
+  port: ${SERVER_PORT:8080}

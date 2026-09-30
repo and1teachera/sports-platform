@@ -2,9 +2,9 @@
 
 A spoiler-free sports platform. Its purpose is to let readers access information about sports events without revealing the game result unless they choose to see it. Most sports services deliver game results as quickly as possible, through notifications, headlines, search matches, video thumbnails and social media feeds, and give people no direct control over when an outcome is revealed; people who watch a game later than it was played need the opposite. A game result will be shown only when the reader explicitly asks for it, and the same applies to anything that could indirectly reveal the outcome: partial scores, player statistics, changes in the standings, or images that show how the event ended. The first version will focus on one sport and one league: basketball and the NBA.
 
-> ### Status: no application code
+> ### Status: build skeleton
 >
-> This repository holds documentation, listed under Documentation below, and no application code. The system described here is designed, not built.
+> The Gradle build and the Spring Boot backend module compile from a clean clone, and one smoke test proves the Spring context starts and Flyway reaches the database. There is no application behaviour yet; further slices arrive with the checkpoints that add them.
 
 ## Constraints
 

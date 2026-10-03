@@ -2,7 +2,7 @@
 
 > ### Status
 >
-> This document describes the designed architecture. No application code exists yet: what follows
+> This document describes the designed architecture. No application behaviour exists yet: what follows
 > is decided, not built, and it covers only what is settled. Which bounded contexts the application
 > will hold is not yet decided, so this document names none.
 

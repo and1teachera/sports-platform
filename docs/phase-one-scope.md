@@ -3,7 +3,7 @@
 > ### Status
 >
 > This document says what the first version of the system, Phase One, is intended to deliver and
-> what it deliberately leaves out. No application code exists yet; everything here is designed,
+> what it deliberately leaves out. No application behaviour exists yet; everything here is designed,
 > not built. The [system description](system-description.md) states the problem, the
 > purpose, the constraints, the actors and the boundary. The [requirements](requirements.md) state
 > the behaviour the published specification requires, and gain detail as the work that implements

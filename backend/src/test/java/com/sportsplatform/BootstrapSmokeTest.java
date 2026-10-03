@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *         {@link Flyway} bean is present, points at the application's datasource, and its
  *         startup validation runs cleanly against the empty migration set.</li>
  * </ol>
- * The production migration set is deliberately empty at this checkpoint.
+ * The production migration set is deliberately empty.
  */
 @SpringBootTest
 class BootstrapSmokeTest {
@@ -69,7 +69,7 @@ class BootstrapSmokeTest {
         // live database and the (empty) classpath migration set.
         flyway.validate();
 
-        // Resolved and applied migration counts are both zero at this checkpoint; the point is
+        // Resolved and applied migration counts are both zero; the point is
         // that Flyway inspected the migration set without throwing.
         assertThat(flyway.info().all()).isEmpty();
         assertThat(flyway.info().applied()).isEmpty();

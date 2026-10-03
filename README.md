@@ -2,9 +2,9 @@
 
 A spoiler-free sports platform. Its purpose is to let readers access information about sports events without revealing the game result unless they choose to see it. Most sports services deliver game results as quickly as possible, through notifications, headlines, search matches, video thumbnails and social media feeds, and give people no direct control over when an outcome is revealed; people who watch a game later than it was played need the opposite. A game result will be shown only when the reader explicitly asks for it, and the same applies to anything that could indirectly reveal the outcome: partial scores, player statistics, changes in the standings, or images that show how the event ended. The first version will focus on one sport and one league: basketball and the NBA.
 
-> ### Status: no application code
+> ### Status: build skeleton
 >
-> This repository holds documentation, listed under Documentation below, and no application code. The system described here is designed, not built.
+> The Gradle build and the Spring Boot backend module compile from a clean clone, and one smoke test proves the Spring context starts and Flyway reaches the database. There is no application behaviour yet; later work adds it.
 
 ## Constraints
 
@@ -20,14 +20,14 @@ The design is a domain-partitioned modular monolith: bounded contexts as top-lev
 
 Two client applications will serve the two interactive surfaces, each chosen against its own surface: a public application, reachable without signing in, whose pages render and are cacheable with no session attached to them, and an administrative application that serves the Administrator, one person, behind a login.
 
-| Part | Technology |
-|---|---|
-| Backend | Java with Spring Boot |
-| Database | PostgreSQL |
-| Identity | Keycloak, with OAuth 2.1 and PKCE |
-| Public application | Next.js with React and TypeScript |
-| Administrative application | Angular with TypeScript |
-| Deployment | Docker Compose, with Nginx in front |
+| Part | Technology | In the repository |
+|---|---|---|
+| Backend | Java 25 with Spring Boot 4, built with Gradle | Yes, as a build skeleton: the application context starts and Flyway runs in its startup; no application behaviour yet |
+| Database | PostgreSQL | In tests only: PostgreSQL 16 in a container that Testcontainers starts; Flyway runs against it, with no migrations yet |
+| Identity | Keycloak, with OAuth 2.1 and PKCE | Not yet |
+| Public application | Next.js with React and TypeScript | Not yet |
+| Administrative application | Angular with TypeScript | Not yet |
+| Deployment | Docker Compose, with Nginx in front | Not yet |
 
 The [architecture overview](docs/architecture.md) describes the shape and its containers in full, the [technical decisions](docs/technical-decisions.md) hold the baseline implementation must respect, and two decision records explain the choices: [ADR-0003](docs/adr/0003-modular-monolith-architecture.md) for the modular monolith and [ADR-0004](docs/adr/0004-client-architecture.md) for the two client applications.
 

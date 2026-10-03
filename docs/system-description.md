@@ -2,7 +2,7 @@
 
 > ### Status
 >
-> This document describes the system and the problem it addresses. No application code exists yet;
+> This document describes the system and the problem it addresses. No application behaviour exists yet;
 > no part of the described system is built. It is the reference from which the detailed
 > requirements and the architecture decisions derive.
 

@@ -3,7 +3,7 @@
 > ### Status
 >
 > This document states the behaviour the published specification currently requires from the
-> system. No application code exists yet: every requirement here is decided, not built. It holds
+> system. No application behaviour exists yet: every requirement here is decided, not built. It holds
 > the foundational requirements that make the [system description](system-description.md)
 > precise; further requirements are published with the work that implements them, under the same
 > headings.

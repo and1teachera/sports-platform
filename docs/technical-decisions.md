@@ -3,7 +3,8 @@
 > ### Status
 >
 > This document is the technical baseline that implementation must respect: the technology,
-> protocol and deployment choices already made. No application code exists yet; each entry states a
+> protocol and deployment choices already made. The repository holds the build baseline below and a
+> backend with no application behaviour yet. Every other entry states a
 > decision in force, and the software that follows it does not exist. The document says what
 > applies; the reason for an architecturally significant choice is in its decision record, linked
 > where one is published. Decisions that concern data collection, resilience, operations or a
@@ -35,3 +36,11 @@
 
 - **Containers.** The system deploys as five Docker containers under Docker Compose: the Spring Boot application, PostgreSQL 16, Keycloak, the public application's server runtime, and Nginx, which serves the administrative application's static files, reverse proxies the API and the public application, and terminates TLS. The [architecture overview](architecture.md) shows how they relate.
 - **Hosts.** A production host and a staging host, each running the same five containers under Docker Compose, deliberately with different hosting companies. Staging verifies correctness, not capacity.
+
+## Build baseline
+
+- **Language.** Java 25, set as the Gradle toolchain: every build and every run uses the same runtime.
+- **Application framework.** Spring Boot 4. The exact release is set in the build files.
+- **Build tool and layout.** Gradle with the Kotlin DSL: one build at the root of the repository, in which the backend is one Gradle module, `backend`. The Gradle wrapper is committed, so the build runs with `./gradlew` and needs no Gradle installation.
+- **Database migrations.** Flyway, as versioned SQL migrations applied at application startup. Spring Boot runs Flyway as part of its own startup, and the backend includes Flyway's PostgreSQL support. The migration set is empty, so a startup finds nothing to apply.
+- **Tests.** JUnit Jupiter, as Spring Boot's test starter brings it. Tests that need a database run against PostgreSQL 16 in Testcontainers, which needs a container runtime on the machine that runs them. Testcontainers is taken from the Spring Boot dependency management and is not versioned separately. A smoke test starts the whole application context against such a database and checks that Flyway is wired into the startup.

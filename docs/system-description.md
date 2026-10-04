@@ -2,8 +2,8 @@
 
 > ### Status
 >
-> This document describes the system and the problem it addresses. No application behaviour exists yet;
-> no part of the described system is built. It is the reference from which the detailed
+> This document describes the system and the problem it addresses. No behaviour a reader can see exists yet;
+> the [README](../README.md) says what is built. It is the reference from which the detailed
 > requirements and the architecture decisions derive.
 
 ## 1. Problem domain

@@ -49,7 +49,7 @@
 ## Competitions and seasons
 
 - **Competition.** A distinct contest a league runs within a season. In Phase One these are the regular season, the NBA Cup, the play-in and the playoffs.
-- **Competition structure.** The data a season is set up from: its competitions and their phases, the teams taking part with their conference and division, and the Cup group assignments. It is prepared data rather than code, as the [Phase One scope](phase-one-scope.md) states.
+- **Competition structure.** The data a season is set up from: its competitions and their phases, the clubs taking part with their conference and division for the season, and the Cup group assignments. It is prepared data rather than code, as the [Phase One scope](phase-one-scope.md) states and [Competition Structure Is Prepared Data](requirements.md#competition-structure-is-prepared-data) requires, and it is where a club's lasting identity enters the system.
 - **Conference and division.** The groupings the league divides its teams into for a season; a team's conference and division membership is season-scoped.
 - **Current season.** The season the word current points at, shown by default, as against an earlier season a reader selects.
 - **Fixture.** A game as the schedule gives it, with its two teams, its date and its start time; it is the shape a game arrives in. A fixture the schedule adds during the season names no competition and no phase until the Administrator has placed it, as [Competition And Phase Are Named](requirements.md#competition-and-phase-are-named) states.

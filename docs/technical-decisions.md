@@ -4,7 +4,7 @@
 >
 > This document is the technical baseline that implementation must respect: the technology,
 > protocol and deployment choices already made. The repository holds the build baseline below and a
-> backend with none of the behaviour the [requirements](requirements.md) describe. Of the other
+> backend with no behaviour a reader can see. Of the other
 > entries, the deny-by-default authorization rule, structured logging with correlation IDs and the
 > health endpoint under observability are in place; every remaining entry states a decision in
 > force whose software does not exist yet. The document says what

@@ -1,18 +1,20 @@
 package com.sportsplatform.league.architecture;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaMethodCall;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.net.URLConnection;
+import java.time.InstantSource;
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noFields;
 
 /**
  * Architecture tests for the League context's boundaries, implementing the rules of
@@ -21,6 +23,11 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
  * <p>Each rule is an {@link ArchRule} whose {@code because(...)} cites the rule by its name
  * in ADR-0006 §3. Rule 9 (Isolation) is covered by rule 1 (Domain independence) while League
  * is the only context, as ADR-0006 states; no separate test is written for it today.</p>
+ *
+ * <p>Rule 1 plus review hold the no-provider-reference concept together: the field-name check
+ * catches naming-only leaks (fields hinting at provider or external references even when typed
+ * as a plain {@code String}), but it cannot by itself detect every semantic violation. Review
+ * at code-change time is the complementary safeguard.</p>
  */
 @AnalyzeClasses(
         packages = "com.sportsplatform",
@@ -58,47 +65,60 @@ public class ArchitectureTests {
             )
             .because("ADR-0006 rule No framework in the domain");
 
-    // Rule 3 — No hidden clock.
+    // Rule 3 — No hidden clock. Four checks replace the earlier seven.
     @ArchTest
-    static final ArchRule domain_does_not_depend_on_the_clock_type = noClasses()
+    static final ArchRule domain_does_not_depend_on_an_instant_source = noClasses()
             .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().dependOnClassesThat().areAssignableTo(Clock.class)
+            .should().dependOnClassesThat().areAssignableTo(InstantSource.class)
             .because("ADR-0006 rule No hidden clock");
 
-    @ArchTest
-    static final ArchRule domain_does_not_call_instant_now = noClasses()
-            .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().callMethod(Instant.class, "now")
-            .because("ADR-0006 rule No hidden clock");
+    private static final DescribedPredicate<JavaMethodCall> CALLS_NOW_ON_JAVA_TIME =
+            new DescribedPredicate<>("calls now()/dateNow() on a java.time type") {
+                @Override
+                public boolean test(JavaMethodCall call) {
+                    String ownerPackage = call.getTargetOwner().getPackageName();
+                    String name = call.getName();
+                    return ownerPackage.startsWith("java.time")
+                            && (name.equals("now") || name.equals("dateNow"));
+                }
+            };
 
     @ArchTest
-    static final ArchRule domain_does_not_call_local_date_now = noClasses()
+    static final ArchRule domain_does_not_call_a_now_method_on_a_java_time_type = noClasses()
             .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().callMethod(LocalDate.class, "now")
+            .should().callMethodWhere(CALLS_NOW_ON_JAVA_TIME)
             .because("ADR-0006 rule No hidden clock");
 
-    @ArchTest
-    static final ArchRule domain_does_not_call_local_date_time_now = noClasses()
-            .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().callMethod(LocalDateTime.class, "now")
-            .because("ADR-0006 rule No hidden clock");
+    private static final DescribedPredicate<JavaMethodCall> IS_CALENDAR_GET_INSTANCE =
+            new DescribedPredicate<>("calls Calendar.getInstance()") {
+                @Override
+                public boolean test(JavaMethodCall call) {
+                    return call.getTargetOwner().isAssignableTo(Calendar.class)
+                            && call.getName().equals("getInstance");
+                }
+            };
 
     @ArchTest
-    static final ArchRule domain_does_not_call_zoned_date_time_now = noClasses()
+    static final ArchRule domain_does_not_use_date_or_calendar_as_clocks = noClasses()
             .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().callMethod(ZonedDateTime.class, "now")
+            .should().callConstructor(Date.class)
+            .orShould().callMethodWhere(IS_CALENDAR_GET_INSTANCE)
             .because("ADR-0006 rule No hidden clock");
 
-    @ArchTest
-    static final ArchRule domain_does_not_call_system_current_time_millis = noClasses()
-            .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().callMethod(System.class, "currentTimeMillis")
-            .because("ADR-0006 rule No hidden clock");
+    private static final DescribedPredicate<JavaMethodCall> IS_SYSTEM_TIME_API =
+            new DescribedPredicate<>("calls System.currentTimeMillis()/nanoTime()") {
+                @Override
+                public boolean test(JavaMethodCall call) {
+                    if (!call.getTargetOwner().getFullName().equals("java.lang.System")) return false;
+                    String name = call.getName();
+                    return name.equals("currentTimeMillis") || name.equals("nanoTime");
+                }
+            };
 
     @ArchTest
-    static final ArchRule domain_does_not_call_system_nano_time = noClasses()
+    static final ArchRule domain_does_not_call_system_time_apis = noClasses()
             .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().callMethod(System.class, "nanoTime")
+            .should().callMethodWhere(IS_SYSTEM_TIME_API)
             .because("ADR-0006 rule No hidden clock");
 
     // Rule 4 — No input or output.
@@ -121,9 +141,9 @@ public class ArchitectureTests {
             .because("ADR-0006 rule No provider reference");
 
     @ArchTest
-    static final ArchRule domain_does_not_depend_on_provider_reference_types = noClasses()
-            .that().resideInAPackage(LEAGUE_DOMAIN)
-            .should().dependOnClassesThat().haveSimpleNameContaining("ProviderReference")
+    static final ArchRule domain_fields_do_not_hint_at_provider_or_external_references = noFields()
+            .that().areDeclaredInClassesThat().resideInAPackage(LEAGUE_DOMAIN)
+            .should().haveNameMatching("(?i).*(provider|external).*")
             .because("ADR-0006 rule No provider reference");
 
     // Rule 6 — Application layer. Subject (..league.application..) is empty at CP6 by design.
@@ -150,7 +170,7 @@ public class ArchitectureTests {
             )
             .because("ADR-0006 rule Persistence adapters");
 
-    // Rule 8 — HTTP clients. Subject: every class outside the future acquisition package.
+    // Rule 8 — HTTP clients. Two checks: package-based and the URLConnection bypass.
     @ArchTest
     static final ArchRule only_acquisition_may_reach_an_http_client = noClasses()
             .that().resideOutsideOfPackage(ACQUISITION)
@@ -162,5 +182,11 @@ public class ArchitectureTests {
                     "org.springframework.web.client..",
                     "org.springframework.web.reactive.function.client.."
             )
+            .because("ADR-0006 rule HTTP clients");
+
+    @ArchTest
+    static final ArchRule only_acquisition_may_reach_an_http_url_connection = noClasses()
+            .that().resideOutsideOfPackage(ACQUISITION)
+            .should().dependOnClassesThat().areAssignableTo(URLConnection.class)
             .because("ADR-0006 rule HTTP clients");
 }

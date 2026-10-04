@@ -2,7 +2,6 @@ package com.sportsplatform.league.application;
 
 import com.sportsplatform.league.domain.Club;
 import com.sportsplatform.league.domain.ClubRepository;
-import com.sportsplatform.league.domain.Clock;
 import com.sportsplatform.league.domain.CorrelationReApplier;
 import com.sportsplatform.league.domain.Fingerprint;
 import com.sportsplatform.league.domain.League;
@@ -15,15 +14,20 @@ import com.sportsplatform.league.domain.SeasonStructureRepository;
 import com.sportsplatform.league.domain.UnitOfWork;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Apply one prepared structure safely. Produces one of three outcomes:
  * {@link ApplyOutcome.Applied}, {@link ApplyOutcome.Unchanged} or
  * {@link ApplyOutcome.RefusedAndRecorded}.
  *
- * <p>The structure is written atomically across every table it occupies, or not at all. The
- * league's current season is set only when the league holds none; a refusal is recorded next to
- * the stored structure and does not halt the system.</p>
+ * <p>Applied and Unchanged share an acceptance step at the end: the clubs' and the league's
+ * display names are upserted, and the correlation re-apply slot is invoked. Refused writes
+ * nothing outside the refusal record.</p>
+ *
+ * <p>The whole thing runs in one database transaction, so a partial structure is never visible.
+ * The current season is set only when the league had none; applying another season does not
+ * move an already-set current season.</p>
  */
 public class ApplyPreparedStructure {
 
@@ -60,23 +64,28 @@ public class ApplyPreparedStructure {
         SeasonStructureId target = structure.id();
         Fingerprint incoming = Fingerprint.of(structure);
 
-        return unitOfWork.execute(() -> decide(input, target, incoming));
+        return unitOfWork.execute(() -> {
+            Optional<Fingerprint> stored = structures.findFingerprint(target);
+            if (stored.isEmpty()) {
+                writeFreshStructure(input, target, incoming);
+                acceptanceStep(input);
+                return new ApplyOutcome.Applied(target, incoming);
+            }
+            if (stored.get().equals(incoming)) {
+                acceptanceStep(input);
+                return new ApplyOutcome.Unchanged(target, stored.get());
+            }
+            refusals.save(new RefusalRecord(target, stored.get(), incoming, clock.now()));
+            return new ApplyOutcome.RefusedAndRecorded(target, stored.get(), incoming);
+        });
     }
 
-    private ApplyOutcome decide(PreparedStructure input, SeasonStructureId target, Fingerprint incoming) {
-        return structures.findFingerprint(target)
-                .map(stored -> stored.equals(incoming)
-                        ? unchanged(target, stored)
-                        : refuse(target, stored, incoming))
-                .orElseGet(() -> applyFresh(input, target, incoming));
-    }
-
-    private ApplyOutcome applyFresh(PreparedStructure input, SeasonStructureId target, Fingerprint fingerprint) {
-        // Write order honours the schema's composite foreign key from
-        // league (id, current_season_id) to season_structure (league_id, season_id): the structure
-        // must exist before a league row names its current season. The current season is set only
-        // when the league held none; applying another season does not move an already-set current
-        // season.
+    private void writeFreshStructure(PreparedStructure input, SeasonStructureId target, Fingerprint fingerprint) {
+        // The composite foreign key on league (id, current_season_id) to
+        // season_structure (league_id, season_id) requires the structure to exist before a
+        // league row names its current season. Save the league first without a current season
+        // (preserving an existing one), then the clubs, then the structure, then — only if the
+        // league had no current season — update the league with its new current season.
         League existingLeague = leagues.find(target.league()).orElse(null);
         boolean leagueKeepsCurrentSeason = existingLeague != null
                 && existingLeague.currentSeason().isPresent();
@@ -95,18 +104,19 @@ public class ApplyPreparedStructure {
         if (!leagueKeepsCurrentSeason) {
             leagues.save(leaguePreStructure.withCurrentSeason(target.season()));
         }
-
-        correlations.reApplyFor(target);
-        return new ApplyOutcome.Applied(target, fingerprint);
     }
 
-    private ApplyOutcome unchanged(SeasonStructureId target, Fingerprint stored) {
-        correlations.reApplyFor(target);
-        return new ApplyOutcome.Unchanged(target, stored);
-    }
-
-    private ApplyOutcome refuse(SeasonStructureId target, Fingerprint stored, Fingerprint incoming) {
-        refusals.save(new RefusalRecord(target, stored, incoming, clock.now()));
-        return new ApplyOutcome.RefusedAndRecorded(target, stored, incoming);
+    /**
+     * The shared acceptance step. Runs at the end of both Applied and Unchanged, inside the same
+     * transaction as any structural write. Upserts club display names, upserts the league's
+     * display name without touching its current season, and invokes the correlation re-apply
+     * slot so provider work can refresh references on both paths.
+     */
+    private void acceptanceStep(PreparedStructure input) {
+        for (Club club : input.clubs()) {
+            clubs.save(club);
+        }
+        leagues.updateDisplayName(input.league().id(), input.league().name());
+        correlations.reApplyFor(input.structure().id());
     }
 }

@@ -3,7 +3,7 @@
 -- already holds one.
 
 alter table season_structure
-    add column fingerprint text;
+    add column fingerprint text not null;
 
 create table refusal_record (
     id                      bigserial primary key,

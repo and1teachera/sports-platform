@@ -10,6 +10,7 @@ import com.sportsplatform.league.domain.Conference;
 import com.sportsplatform.league.domain.CupGroup;
 import com.sportsplatform.league.domain.CupGroupId;
 import com.sportsplatform.league.domain.Division;
+import com.sportsplatform.league.domain.Fingerprint;
 import com.sportsplatform.league.domain.League;
 import com.sportsplatform.league.domain.LeagueId;
 import com.sportsplatform.league.domain.LeagueRepository;
@@ -66,7 +67,8 @@ class LeaguePersistenceTest extends DatabaseCleanedIntegrationTest {
         assertThat(loaded.name()).isEqualTo("NBA");
         assertThat(loaded.currentSeason()).isEmpty();
 
-        structures.save(emptyStructure(leagueId, seasonId));
+        var empty = emptyStructure(leagueId, seasonId);
+        structures.save(empty, Fingerprint.of(empty));
         leagues.save(loaded.withCurrentSeason(seasonId));
 
         var withCurrent = leagues.find(leagueId).orElseThrow();
@@ -119,7 +121,7 @@ class LeaguePersistenceTest extends DatabaseCleanedIntegrationTest {
         );
 
         var saved = new SeasonStructure(structureId, List.of(regular, cup), placements, participations);
-        structures.save(saved);
+        structures.save(saved, Fingerprint.of(saved));
 
         var loaded = structures.find(structureId).orElseThrow();
         assertThat(loaded).isEqualTo(saved);
@@ -131,9 +133,11 @@ class LeaguePersistenceTest extends DatabaseCleanedIntegrationTest {
         var seasonId = new SeasonId("2026-2027");
         leagues.save(League.withoutCurrentSeason(leagueId, "NBA"));
 
-        structures.save(emptyStructure(leagueId, seasonId));
+        var empty = emptyStructure(leagueId, seasonId);
+        var fp = Fingerprint.of(empty);
+        structures.save(empty, fp);
 
-        assertThatThrownBy(() -> structures.save(emptyStructure(leagueId, seasonId)))
+        assertThatThrownBy(() -> structures.save(empty, fp))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 

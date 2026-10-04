@@ -35,7 +35,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * End-to-end apply operation on PostgreSQL: the three outcomes, the current-season rule, the
  * canonical-form fingerprint reconciliation, the acceptance step's refresh of display names on
- * Unchanged, and the refused-path postconditions.
+ * Unchanged, and the refused-path postconditions. The three clubs the fixtures use (Boston
+ * Celtics, Chicago Bulls, Golden State Warriors) match the YAML seed fixture's clubs, so a reader
+ * of the two files sees the same seed exercised through two different mechanisms.
  */
 @SpringBootTest
 class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTest {
@@ -50,9 +52,28 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
     private static final SeasonId SEASON_ID = new SeasonId("2026-2027");
     private static final SeasonStructureId TARGET = new SeasonStructureId(LEAGUE_ID, SEASON_ID);
 
+    private static final ClubId CELTICS = new ClubId("club-001");
+    private static final ClubId BULLS = new ClubId("club-006");
+    private static final ClubId WARRIORS = new ClubId("club-021");
+
+    private static final String LEAGUE_FULL_NAME = "National Basketball Association";
+    private static final String LEAGUE_SHORT_NAME = "NBA";
+    private static final String CELTICS_FULL_NAME = "Boston Celtics";
+    private static final String CELTICS_SHORT_NAME = "Celtics";
+    private static final String BULLS_FULL_NAME = "Chicago Bulls";
+    private static final String BULLS_SHORT_NAME = "Bulls";
+    private static final String WARRIORS_FULL_NAME = "Golden State Warriors";
+    private static final String WARRIORS_SHORT_NAME = "Warriors";
+
+    private static final CompetitionId REGULAR_SEASON = new CompetitionId("regular-season-2026-2027");
+    private static final CompetitionId NBA_CUP = new CompetitionId("nba-cup-2026");
+    private static final CupGroupId EAST_GROUP_A = new CupGroupId("east-group-a");
+    private static final CupGroupId EAST_GROUP_C = new CupGroupId("east-group-c");
+    private static final CupGroupId WEST_GROUP_C = new CupGroupId("west-group-c");
+
     @Test
     void applied_writes_the_whole_structure_and_sets_the_current_season() {
-        var outcome = apply.apply(prepared("baseline", NameSet.ORIGINAL));
+        var outcome = apply.apply(prepared("baseline", NameSet.FULL));
 
         assertThat(outcome).isInstanceOf(ApplyOutcome.Applied.class);
         var applied = (ApplyOutcome.Applied) outcome;
@@ -60,10 +81,10 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
 
         assertThat(leagues.find(LEAGUE_ID)).hasValueSatisfying(l -> {
             assertThat(l.currentSeason()).contains(SEASON_ID);
-            assertThat(l.name()).isEqualTo("NBA");
+            assertThat(l.name()).isEqualTo(LEAGUE_FULL_NAME);
         });
-        assertThat(clubRepository.find(new ClubId("c-1"))).hasValueSatisfying(c ->
-                assertThat(c.name()).isEqualTo("Club 1"));
+        assertThat(clubRepository.find(CELTICS)).hasValueSatisfying(c ->
+                assertThat(c.name()).isEqualTo(CELTICS_FULL_NAME));
         assertThat(structures.find(TARGET)).isPresent();
         assertThat(structures.findFingerprint(TARGET)).contains(applied.fingerprint());
         assertThat(countRefusals()).isZero();
@@ -71,22 +92,22 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
 
     @Test
     void unchanged_when_the_same_input_is_applied_again() {
-        apply.apply(prepared("baseline", NameSet.ORIGINAL));
-        var second = apply.apply(prepared("baseline", NameSet.ORIGINAL));
+        apply.apply(prepared("baseline", NameSet.FULL));
+        var second = apply.apply(prepared("baseline", NameSet.FULL));
         assertThat(second).isInstanceOf(ApplyOutcome.Unchanged.class);
         assertThat(countRefusals()).isZero();
     }
 
     @Test
     void refused_and_recorded_when_the_fingerprint_differs() {
-        var first = apply.apply(prepared("baseline", NameSet.ORIGINAL));
+        var first = apply.apply(prepared("baseline", NameSet.FULL));
         assertThat(first).isInstanceOf(ApplyOutcome.Applied.class);
         Fingerprint storedBeforeRefusal = structures.findFingerprint(TARGET).orElseThrow();
 
-        // Alter structural participations AND rename clubs and league. On a refused path, none
+        // Alter structural participations AND use the short-form names. On a refused path, none
         // of these must land: the stored structure stays as it was, the fingerprint does not
         // change, and the display names are not refreshed.
-        var outcome = apply.apply(prepared("altered", NameSet.RENAMED));
+        var outcome = apply.apply(prepared("altered", NameSet.SHORT));
 
         assertThat(outcome).isInstanceOf(ApplyOutcome.RefusedAndRecorded.class);
         var refusal = (ApplyOutcome.RefusedAndRecorded) outcome;
@@ -97,10 +118,10 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
         assertThat(structures.findFingerprint(TARGET)).contains(storedBeforeRefusal);
         assertThat(leagues.find(LEAGUE_ID).orElseThrow().name())
                 .as("league display name must be unchanged on a refused apply")
-                .isEqualTo("NBA");
-        assertThat(clubRepository.find(new ClubId("c-1")).orElseThrow().name())
+                .isEqualTo(LEAGUE_FULL_NAME);
+        assertThat(clubRepository.find(CELTICS).orElseThrow().name())
                 .as("club display name must be unchanged on a refused apply")
-                .isEqualTo("Club 1");
+                .isEqualTo(CELTICS_FULL_NAME);
 
         assertThat(countRefusals()).isEqualTo(1);
         var row = jdbc.sql("""
@@ -116,30 +137,32 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
 
     @Test
     void reordered_input_fingerprints_as_the_same_structure() {
-        apply.apply(prepared("baseline", NameSet.ORIGINAL));
-        var reordered = apply.apply(preparedReordered(NameSet.ORIGINAL));
+        apply.apply(prepared("baseline", NameSet.FULL));
+        var reordered = apply.apply(preparedReordered(NameSet.FULL));
         assertThat(reordered).isInstanceOf(ApplyOutcome.Unchanged.class);
         assertThat(countRefusals()).isZero();
     }
 
     @Test
     void renamed_club_and_league_on_unchanged_input_are_applied_to_their_rows_but_not_the_structure() {
-        var first = apply.apply(prepared("baseline", NameSet.ORIGINAL));
+        var first = apply.apply(prepared("baseline", NameSet.FULL));
         assertThat(first).isInstanceOf(ApplyOutcome.Applied.class);
         Fingerprint storedBefore = structures.findFingerprint(TARGET).orElseThrow();
 
-        // Same structural facts, renamed clubs and renamed league.
-        var outcome = apply.apply(prepared("baseline", NameSet.RENAMED));
+        // Same structural facts; the second application carries the short-form variants of the
+        // same real-world names (NBA is an abbreviation of the full form, and the club short
+        // forms are commonly used in headlines and standings tables).
+        var outcome = apply.apply(prepared("baseline", NameSet.SHORT));
 
         assertThat(outcome).isInstanceOf(ApplyOutcome.Unchanged.class);
         assertThat(structures.findFingerprint(TARGET)).contains(storedBefore);
         assertThat(countRefusals()).isZero();
 
-        // Display names are refreshed.
-        assertThat(leagues.find(LEAGUE_ID).orElseThrow().name()).isEqualTo("Renamed League");
-        assertThat(clubRepository.find(new ClubId("c-1")).orElseThrow().name()).isEqualTo("Renamed Club 1");
-        assertThat(clubRepository.find(new ClubId("c-2")).orElseThrow().name()).isEqualTo("Renamed Club 2");
-        assertThat(clubRepository.find(new ClubId("c-3")).orElseThrow().name()).isEqualTo("Renamed Club 3");
+        // Display names are refreshed to the short forms.
+        assertThat(leagues.find(LEAGUE_ID).orElseThrow().name()).isEqualTo(LEAGUE_SHORT_NAME);
+        assertThat(clubRepository.find(CELTICS).orElseThrow().name()).isEqualTo(CELTICS_SHORT_NAME);
+        assertThat(clubRepository.find(BULLS).orElseThrow().name()).isEqualTo(BULLS_SHORT_NAME);
+        assertThat(clubRepository.find(WARRIORS).orElseThrow().name()).isEqualTo(WARRIORS_SHORT_NAME);
 
         // League's current season is unchanged.
         assertThat(leagues.find(LEAGUE_ID).orElseThrow().currentSeason()).contains(SEASON_ID);
@@ -147,13 +170,13 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
 
     @Test
     void current_season_is_not_moved_when_the_league_already_has_one() {
-        apply.apply(prepared("baseline", NameSet.ORIGINAL));
+        apply.apply(prepared("baseline", NameSet.FULL));
         assertThat(leagues.find(LEAGUE_ID).orElseThrow().currentSeason()).contains(SEASON_ID);
 
         var otherSeason = new SeasonId("2027-2028");
         var otherTarget = new SeasonStructureId(LEAGUE_ID, otherSeason);
         var otherStructure = new SeasonStructure(otherTarget, List.of(), List.of(), List.of());
-        var otherLeague = new League(LEAGUE_ID, "NBA", null);
+        var otherLeague = new League(LEAGUE_ID, LEAGUE_FULL_NAME, null);
         apply.apply(new PreparedStructure(otherLeague, List.of(), otherStructure));
 
         assertThat(leagues.find(LEAGUE_ID).orElseThrow().currentSeason())
@@ -164,7 +187,7 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
     @Test
     void current_season_is_set_when_the_league_has_none_before_apply() {
         assertThat(leagues.find(LEAGUE_ID)).isEmpty();
-        apply.apply(prepared("baseline", NameSet.ORIGINAL));
+        apply.apply(prepared("baseline", NameSet.FULL));
         assertThat(leagues.find(LEAGUE_ID))
                 .hasValueSatisfying(l -> assertThat(l.currentSeason()).contains(SEASON_ID));
     }
@@ -176,10 +199,11 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
         try {
             new SeasonStructure(
                     TARGET,
-                    List.of(new Competition(new CompetitionId("regular"), "Regular",
-                            List.of(new Phase(new PhaseId("p"), "P", 1, List.of())))),
+                    List.of(new Competition(REGULAR_SEASON, "Regular Season",
+                            List.of(new Phase(new PhaseId("regular-season-2026-2027-phase-1"),
+                                    "Regular Season", 1, List.of())))),
                     List.of(),
-                    List.of(CompetitionParticipation.inCompetition(new ClubId("c-404"), new CompetitionId("regular")))
+                    List.of(CompetitionParticipation.inCompetition(new ClubId("club-404"), REGULAR_SEASON))
             );
             throw new AssertionError("expected InvalidSeasonStructure");
         } catch (com.sportsplatform.league.domain.InvalidSeasonStructure expected) {
@@ -194,19 +218,21 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
     @Test
     void invalid_prepared_structure_rejects_cross_check_violations_before_apply_runs() {
         // Build a valid-aggregate SeasonStructure then compose a PreparedStructure that violates
-        // the cross-field checks: a placement names a club the input's club list omits, and the
-        // included club names a different league.
+        // the cross-field checks: a placement names a club the input's club list omits
+        // (club-404), and the included club carries the wrong league id.
         var structure = new SeasonStructure(
                 TARGET,
-                List.of(new Competition(new CompetitionId("regular"), "Regular",
-                        List.of(new Phase(new PhaseId("p"), "P", 1, List.of())))),
-                List.of(new SeasonPlacement(new ClubId("missing"), new Conference("East"), new Division("Atlantic"))),
+                List.of(new Competition(REGULAR_SEASON, "Regular Season",
+                        List.of(new Phase(new PhaseId("regular-season-2026-2027-phase-1"),
+                                "Regular Season", 1, List.of())))),
+                List.of(new SeasonPlacement(new ClubId("club-404"),
+                        new Conference("Eastern Conference"), new Division("Atlantic"))),
                 List.of()
         );
-        var otherLeague = new LeagueId("other");
+        var differentLeague = new LeagueId("other-league");
         assertThatThrownBy(() -> new PreparedStructure(
-                new League(LEAGUE_ID, "NBA", null),
-                List.of(new Club(new ClubId("c-x"), otherLeague, "Club X")),
+                new League(LEAGUE_ID, LEAGUE_FULL_NAME, null),
+                List.of(new Club(CELTICS, differentLeague, CELTICS_FULL_NAME)),
                 structure))
                 .isInstanceOf(InvalidPreparedStructure.class)
                 .satisfies(e -> {
@@ -223,7 +249,7 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
 
     // ---- fixtures ----
 
-    private enum NameSet { ORIGINAL, RENAMED }
+    private enum NameSet { FULL, SHORT }
 
     private PreparedStructure prepared(String variant, NameSet names) {
         return build(variant, names, false);
@@ -234,48 +260,61 @@ class ApplyPreparedStructureIntegrationTest extends DatabaseCleanedIntegrationTe
     }
 
     private PreparedStructure build(String variant, NameSet names, boolean reordered) {
-        var leagueName = names == NameSet.ORIGINAL ? "NBA" : "Renamed League";
+        var leagueName = names == NameSet.FULL ? LEAGUE_FULL_NAME : LEAGUE_SHORT_NAME;
         var league = new League(LEAGUE_ID, leagueName, null);
 
-        var clubs = names == NameSet.ORIGINAL
+        var clubs = names == NameSet.FULL
                 ? List.of(
-                        new Club(new ClubId("c-1"), LEAGUE_ID, "Club 1"),
-                        new Club(new ClubId("c-2"), LEAGUE_ID, "Club 2"),
-                        new Club(new ClubId("c-3"), LEAGUE_ID, "Club 3"))
+                        new Club(CELTICS, LEAGUE_ID, CELTICS_FULL_NAME),
+                        new Club(BULLS, LEAGUE_ID, BULLS_FULL_NAME),
+                        new Club(WARRIORS, LEAGUE_ID, WARRIORS_FULL_NAME))
                 : List.of(
-                        new Club(new ClubId("c-1"), LEAGUE_ID, "Renamed Club 1"),
-                        new Club(new ClubId("c-2"), LEAGUE_ID, "Renamed Club 2"),
-                        new Club(new ClubId("c-3"), LEAGUE_ID, "Renamed Club 3"));
+                        new Club(CELTICS, LEAGUE_ID, CELTICS_SHORT_NAME),
+                        new Club(BULLS, LEAGUE_ID, BULLS_SHORT_NAME),
+                        new Club(WARRIORS, LEAGUE_ID, WARRIORS_SHORT_NAME));
 
-        var regularPhase = new Phase(new PhaseId("regular-phase"), "Regular", 1, List.of());
-        var cupGroupPhase = new Phase(new PhaseId("cup-group"), "Groups", 1, List.of(
-                new CupGroup(new CupGroupId("group-a"), "Group A"),
-                new CupGroup(new CupGroupId("group-b"), "Group B")));
-        var cupKnockoutPhase = new Phase(new PhaseId("cup-knockout"), "Knockout", 2, List.of());
+        var regularPhase = new Phase(
+                new PhaseId("regular-season-2026-2027-phase-1"), "Regular Season", 1, List.of());
+        var cupGroupPhase = new Phase(
+                new PhaseId("nba-cup-2026-group-play"), "Group Play", 1, List.of(
+                        new CupGroup(EAST_GROUP_A, "East Group A"),
+                        new CupGroup(EAST_GROUP_C, "East Group C"),
+                        new CupGroup(WEST_GROUP_C, "West Group C")));
+        var cupKnockoutPhase = new Phase(
+                new PhaseId("nba-cup-2026-knockout-rounds"), "Knockout Rounds", 2, List.of());
 
-        var regular = new Competition(new CompetitionId("regular"), "Regular Season", List.of(regularPhase));
-        var cup = new Competition(new CompetitionId("cup"), "Cup", List.of(cupGroupPhase, cupKnockoutPhase));
+        var regular = new Competition(REGULAR_SEASON, "Regular Season", List.of(regularPhase));
+        var cup = new Competition(NBA_CUP, "NBA Cup", List.of(cupGroupPhase, cupKnockoutPhase));
 
         var placements = List.of(
-                new SeasonPlacement(new ClubId("c-1"), new Conference("East"), new Division("Atlantic")),
-                new SeasonPlacement(new ClubId("c-2"), new Conference("East"), new Division("Atlantic")),
-                new SeasonPlacement(new ClubId("c-3"), new Conference("West"), new Division("Pacific")));
+                new SeasonPlacement(CELTICS,
+                        new Conference("Eastern Conference"), new Division("Atlantic")),
+                new SeasonPlacement(BULLS,
+                        new Conference("Eastern Conference"), new Division("Central")),
+                new SeasonPlacement(WARRIORS,
+                        new Conference("Western Conference"), new Division("Pacific")));
 
         List<CompetitionParticipation> participations;
         if ("altered".equals(variant)) {
+            // Boston Celtics moves from East Group C to East Group A; every other participation
+            // stays the same. One structural change is enough to make the fingerprint differ.
             participations = List.of(
-                    CompetitionParticipation.inCompetition(new ClubId("c-1"), new CompetitionId("regular")),
-                    CompetitionParticipation.inCompetition(new ClubId("c-2"), new CompetitionId("regular")),
-                    CompetitionParticipation.inCompetition(new ClubId("c-3"), new CompetitionId("regular")),
-                    CompetitionParticipation.inCupGroup(new ClubId("c-1"), new CompetitionId("cup"), new CupGroupId("group-b")),
-                    CompetitionParticipation.inCupGroup(new ClubId("c-2"), new CompetitionId("cup"), new CupGroupId("group-a")));
+                    CompetitionParticipation.inCompetition(CELTICS, REGULAR_SEASON),
+                    CompetitionParticipation.inCompetition(BULLS, REGULAR_SEASON),
+                    CompetitionParticipation.inCompetition(WARRIORS, REGULAR_SEASON),
+                    CompetitionParticipation.inCupGroup(CELTICS, NBA_CUP, EAST_GROUP_A),
+                    CompetitionParticipation.inCupGroup(BULLS, NBA_CUP, EAST_GROUP_C),
+                    CompetitionParticipation.inCupGroup(WARRIORS, NBA_CUP, WEST_GROUP_C));
         } else {
+            // Baseline: Boston Celtics and Chicago Bulls share East Group C (their real 2026
+            // group); Golden State Warriors is in West Group C (their real 2026 group).
             participations = List.of(
-                    CompetitionParticipation.inCompetition(new ClubId("c-1"), new CompetitionId("regular")),
-                    CompetitionParticipation.inCompetition(new ClubId("c-2"), new CompetitionId("regular")),
-                    CompetitionParticipation.inCompetition(new ClubId("c-3"), new CompetitionId("regular")),
-                    CompetitionParticipation.inCupGroup(new ClubId("c-1"), new CompetitionId("cup"), new CupGroupId("group-a")),
-                    CompetitionParticipation.inCupGroup(new ClubId("c-2"), new CompetitionId("cup"), new CupGroupId("group-b")));
+                    CompetitionParticipation.inCompetition(CELTICS, REGULAR_SEASON),
+                    CompetitionParticipation.inCompetition(BULLS, REGULAR_SEASON),
+                    CompetitionParticipation.inCompetition(WARRIORS, REGULAR_SEASON),
+                    CompetitionParticipation.inCupGroup(CELTICS, NBA_CUP, EAST_GROUP_C),
+                    CompetitionParticipation.inCupGroup(BULLS, NBA_CUP, EAST_GROUP_C),
+                    CompetitionParticipation.inCupGroup(WARRIORS, NBA_CUP, WEST_GROUP_C));
         }
 
         if (reordered) {

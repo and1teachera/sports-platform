@@ -3,7 +3,7 @@
 > ### Status
 >
 > This document states the behaviour the published specification currently requires from the
-> system. No application behaviour exists yet: every requirement here is decided, not built. It holds
+> system. No behaviour a reader can see exists yet: every requirement here is decided, and the [README](../README.md) says what is built. It holds
 > the foundational requirements that make the [system description](system-description.md)
 > precise; further requirements are published with the work that implements them, under the same
 > headings.
@@ -59,6 +59,12 @@ Outcome-bearing information is any value from which a reader could work out who 
 ### Reveal Records Are Kept Indefinitely
 
 A logged-in user's record of which games they have revealed is never removed. There is no expiry and no clearing. A logged-in user who returns after two years finds the games they had already revealed still showing their game results, which is the behaviour that makes the product work on a return visit. Never removed means never expired or cleared while the account exists: when the account is deleted, its reveal record is deleted with it.
+
+## Season management
+
+### Competition Structure Is Prepared Data
+
+The competition structure is data and never code: which leagues exist, which competitions a season holds and their ordered phases, which clubs take part in the season with each club's conference and division for that season, which competitions each club takes part in, and the Cup group assignments. No data provider's conference or division values are used. Every season's structure arrives as prepared data, not only the first; no screen edits it, and a later season is another set of prepared data rather than a code change. Nothing creates a structure and nothing copies one from the season before, because last season's Cup groups are not this season's, and a copy that is silently wrong is worse than a structure that is visibly missing. Applying a season's prepared structure again changes nothing when it is the same structure, and a different structure for a season that already holds one is refused and recorded, never applied silently. Two structures are the same when they agree, in whatever order they are listed, on the season's competitions, their ordered phases and their Cup groups, on which clubs take part in which competition and which Cup group, and on each club's conference and division. A club's name or abbreviation, the names of the competitions, phases, Cup groups and the league itself, and the references the providers use for a club are not part of the structure, so changing them makes no different structure and is never refused.
 
 ## Resilience
 

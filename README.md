@@ -4,7 +4,7 @@ A spoiler-free sports platform. Its purpose is to let readers access information
 
 > ### Status: backend foundation
 >
-> The Gradle build and the Spring Boot backend compile from a clean clone, and a GitHub Actions workflow builds and tests every pull request. In tests, the backend starts against PostgreSQL in a container and runs Flyway in its startup. It refuses every request it has no explicit rule for, with the health endpoint as the one public exception, and it writes structured JSON logs, with a request's correlation ID on every line written while that request is handled. Architecture tests fail the build when League's domain depends on a framework, the clock, input or output, or a provider reference, as [ADR-0006](docs/adr/0006-boundary-enforcement.md) decides. None of the behaviour the [requirements](docs/requirements.md) describe exists yet; later work adds it.
+> The Gradle build and the Spring Boot backend compile from a clean clone, and a GitHub Actions workflow builds and tests every pull request. In tests, the backend starts against PostgreSQL in a container and runs Flyway in its startup. It refuses every request it has no explicit rule for, with the health endpoint as the one public exception, and it writes structured JSON logs, with a request's correlation ID on every line written while that request is handled. Architecture tests fail the build when League's domain depends on a framework, the clock, input or output, or a provider reference, as [ADR-0006](docs/adr/0006-boundary-enforcement.md) decides. The League context can apply a season's [prepared structure](docs/requirements.md#competition-structure-is-prepared-data) to the database as a whole or not at all: applying the same structure again changes nothing, and a different structure for a season that already holds one is refused and recorded. Nothing runs that operation yet, and no behaviour a reader can see exists yet; later work adds it.
 
 ## Constraints
 
@@ -22,8 +22,8 @@ Two client applications will serve the two interactive surfaces, each chosen aga
 
 | Part | Technology | In the repository |
 |---|---|---|
-| Backend | Java 25 with Spring Boot 4, built with Gradle | Yes, as a foundation: the application context starts and Flyway runs in its startup, requests are denied unless a rule permits them, and logs are structured JSON with a correlation ID; none of the specified behaviour yet |
-| Database | PostgreSQL | In tests only: PostgreSQL 16 in a container that Testcontainers starts; Flyway applies the League schema (V1) against it |
+| Backend | Java 25 with Spring Boot 4, built with Gradle | Yes, as a foundation: the application context starts and Flyway runs in its startup, requests are denied unless a rule permits them, and logs are structured JSON with a correlation ID; the League context can apply a season's prepared structure, though nothing runs it yet; no behaviour a reader can see yet |
+| Database | PostgreSQL | In tests only: PostgreSQL 16 in a container that Testcontainers starts; Flyway applies the League's migrations against it |
 | Identity | Keycloak, with OAuth 2.1 and PKCE | Not yet |
 | Public application | Next.js with React and TypeScript | Not yet |
 | Administrative application | Angular with TypeScript | Not yet |

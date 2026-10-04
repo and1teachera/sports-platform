@@ -2,8 +2,8 @@
 
 > ### Status
 >
-> This document describes the designed architecture. No application behaviour exists yet: what follows
-> is decided, not built, and it covers only what is settled. The first bounded contexts the
+> This document describes the designed architecture. No behaviour a reader can see exists yet: what follows
+> is decided and covers only what is settled, and the [README](../README.md) says what is built. The first bounded contexts the
 > application needs are decided in [ADR-0005, Bounded contexts](adr/0005-bounded-contexts.md).
 
 ## Driving architectural characteristics

@@ -2,9 +2,9 @@
 
 A spoiler-free sports platform. Its purpose is to let readers access information about sports events without revealing the game result unless they choose to see it. Most sports services deliver game results as quickly as possible, through notifications, headlines, search matches, video thumbnails and social media feeds, and give people no direct control over when an outcome is revealed; people who watch a game later than it was played need the opposite. A game result will be shown only when the reader explicitly asks for it, and the same applies to anything that could indirectly reveal the outcome: partial scores, player statistics, changes in the standings, or images that show how the event ended. The first version will focus on one sport and one league: basketball and the NBA.
 
-> ### Status: build skeleton
+> ### Status: backend foundation
 >
-> The Gradle build and the Spring Boot backend module compile from a clean clone, and one smoke test proves the Spring context starts and Flyway reaches the database. There is no application behaviour yet; later work adds it.
+> The Gradle build and the Spring Boot backend compile from a clean clone, and a GitHub Actions workflow builds and tests every pull request. In tests, the backend starts against PostgreSQL in a container and runs Flyway in its startup. It refuses every request it has no explicit rule for, with the health endpoint as the one public exception, and it writes structured JSON logs, with a request's correlation ID on every line written while that request is handled. None of the behaviour the [requirements](docs/requirements.md) describe exists yet; later work adds it.
 
 ## Constraints
 
@@ -22,7 +22,7 @@ Two client applications will serve the two interactive surfaces, each chosen aga
 
 | Part | Technology | In the repository |
 |---|---|---|
-| Backend | Java 25 with Spring Boot 4, built with Gradle | Yes, as a build skeleton: the application context starts and Flyway runs in its startup; no application behaviour yet |
+| Backend | Java 25 with Spring Boot 4, built with Gradle | Yes, as a foundation: the application context starts and Flyway runs in its startup, requests are denied unless a rule permits them, and logs are structured JSON with a correlation ID; none of the specified behaviour yet |
 | Database | PostgreSQL | In tests only: PostgreSQL 16 in a container that Testcontainers starts; Flyway runs against it, with no migrations yet |
 | Identity | Keycloak, with OAuth 2.1 and PKCE | Not yet |
 | Public application | Next.js with React and TypeScript | Not yet |
@@ -30,6 +30,16 @@ Two client applications will serve the two interactive surfaces, each chosen aga
 | Deployment | Docker Compose, with Nginx in front | Not yet |
 
 The [architecture overview](docs/architecture.md) describes the shape and its containers in full, the [technical decisions](docs/technical-decisions.md) hold the baseline implementation must respect, and two decision records explain the choices: [ADR-0003](docs/adr/0003-modular-monolith-architecture.md) for the modular monolith and [ADR-0004](docs/adr/0004-client-architecture.md) for the two client applications.
+
+## Building and testing
+
+The build needs a JDK 25 and a container runtime such as Docker, because the integration tests start PostgreSQL in a container. From a clean clone:
+
+```
+./gradlew build
+```
+
+A GitHub Actions workflow runs the same build on every pull request, and a pull request cannot merge until it passes.
 
 ## Documentation
 

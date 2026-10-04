@@ -4,7 +4,7 @@ A spoiler-free sports platform. Its purpose is to let readers access information
 
 > ### Status: backend foundation
 >
-> The Gradle build and the Spring Boot backend compile from a clean clone, and a GitHub Actions workflow builds and tests every pull request. In tests, the backend starts against PostgreSQL in a container and runs Flyway in its startup. It refuses every request it has no explicit rule for, with the health endpoint as the one public exception, and it writes structured JSON logs, with a request's correlation ID on every line written while that request is handled. None of the behaviour the [requirements](docs/requirements.md) describe exists yet; later work adds it.
+> The Gradle build and the Spring Boot backend compile from a clean clone, and a GitHub Actions workflow builds and tests every pull request. In tests, the backend starts against PostgreSQL in a container and runs Flyway in its startup. It refuses every request it has no explicit rule for, with the health endpoint as the one public exception, and it writes structured JSON logs, with a request's correlation ID on every line written while that request is handled. Architecture tests fail the build when League's domain depends on a framework, the clock, input or output, or a provider reference, as [ADR-0006](docs/adr/0006-boundary-enforcement.md) decides. None of the behaviour the [requirements](docs/requirements.md) describe exists yet; later work adds it.
 
 ## Constraints
 
@@ -29,7 +29,7 @@ Two client applications will serve the two interactive surfaces, each chosen aga
 | Administrative application | Angular with TypeScript | Not yet |
 | Deployment | Docker Compose, with Nginx in front | Not yet |
 
-The [architecture overview](docs/architecture.md) describes the shape and its containers in full, the [technical decisions](docs/technical-decisions.md) hold the baseline implementation must respect, and two decision records explain the choices: [ADR-0003](docs/adr/0003-modular-monolith-architecture.md) for the modular monolith and [ADR-0004](docs/adr/0004-client-architecture.md) for the two client applications.
+The [architecture overview](docs/architecture.md) describes the shape and its containers in full, the [technical decisions](docs/technical-decisions.md) hold the baseline implementation must respect, and four decision records explain the choices: [ADR-0003](docs/adr/0003-modular-monolith-architecture.md) for the modular monolith, [ADR-0004](docs/adr/0004-client-architecture.md) for the two client applications, [ADR-0005](docs/adr/0005-bounded-contexts.md) for its bounded contexts and [ADR-0006](docs/adr/0006-boundary-enforcement.md) for how their boundaries are enforced.
 
 ## Building and testing
 
@@ -55,6 +55,7 @@ A GitHub Actions workflow runs the same build on every pull request, and a pull 
   - [ADR-0003: Modular monolith architecture](docs/adr/0003-modular-monolith-architecture.md)
   - [ADR-0004: Two client applications, chosen against their own constraints](docs/adr/0004-client-architecture.md)
   - [ADR-0005: Bounded contexts](docs/adr/0005-bounded-contexts.md)
+  - [ADR-0006: Boundary enforcement](docs/adr/0006-boundary-enforcement.md)
 
 Further documentation is published with the work that needs it and listed here as it lands.
 

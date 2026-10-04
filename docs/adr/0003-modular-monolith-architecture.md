@@ -11,7 +11,7 @@ The driving characteristics are reliability under constraint, quota-efficiency, 
 
 ## Decision
 
-Build a **domain-partitioned modular monolith**: bounded contexts as top-level **packages**, **hexagonal (ports and adapters) inside each**, with boundaries **enforced** but **not distributed**. The enforcement mechanism is decided in a record of its own. The quota governor and provider machinery run in-process. No context is split into a separately deployable service in the first release.
+Build a **domain-partitioned modular monolith**: bounded contexts as top-level **packages**, **hexagonal (ports and adapters) inside each**, with boundaries **enforced** but **not distributed**. The enforcement mechanism is decided in [ADR-0006, Boundary enforcement](0006-boundary-enforcement.md). The quota governor and provider machinery run in-process. No context is split into a separately deployable service in the first release.
 
 ## Consequences
 

@@ -22,7 +22,7 @@ Two facts decide the mechanism. [ADR-0005, Bounded contexts](0005-bounded-contex
 | Rule | What the build checks |
 |---|---|
 | Domain independence | League's domain depends only on itself and the JDK |
-| No framework in the domain | The domain uses none of Spring, Lombok, Jackson, Hibernate or Flyway |
+| No framework in the domain | The domain uses none of Spring, Lombok, Jackson, Hibernate or Flyway, nor any `jakarta..` type (JPA, validation, servlet and injection annotations live there) |
 | No hidden clock | The domain never asks the system for the current time |
 | No input or output | The domain uses nothing from `java.io`, `java.nio.file`, `java.net` or `java.sql` |
 | No provider reference | The domain declares no type that represents a provider reference |

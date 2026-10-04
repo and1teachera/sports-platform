@@ -98,7 +98,7 @@
 ## Architecture
 
 - **Administrative application.** The client application for the Administrator, behind a login and English only, written in Angular with TypeScript. It is a client of the same API as the public application, as [ADR-0004](adr/0004-client-architecture.md) decides.
-- **Bounded context.** A module that owns its own model, its own vocabulary and its own data, and reaches another module only across a defined boundary. Which bounded contexts the application will hold is not yet decided.
+- **Bounded context.** A module that owns its own model, its own vocabulary and its own data, and reaches another module only across a defined boundary. The first bounded contexts the application needs are decided in [ADR-0005, Bounded contexts](adr/0005-bounded-contexts.md).
 - **Container.** One of the runtime units the system deploys under Docker Compose. The [architecture overview](architecture.md) names them and shows how they relate.
 - **Hexagonal (ports and adapters).** The layering used inside each bounded context: a domain core that depends on nothing outside itself, the ports through which it is driven and through which it asks for what it needs, and the adapters at the edges that implement those ports.
 - **Modular monolith.** One deployable application whose bounded contexts are modules with enforced boundaries rather than separately deployed services, as [ADR-0003](adr/0003-modular-monolith-architecture.md) decides.

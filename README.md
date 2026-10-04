@@ -16,14 +16,14 @@ Three constraints apply to every part of the system and to every decision made a
 
 ## Architecture and technology
 
-The design is a domain-partitioned modular monolith: bounded contexts as top-level packages, hexagonal (ports and adapters) inside each, with boundaries enforced but not distributed. No context is split into a separately deployable service in the first release. Which bounded contexts the application will hold is not yet decided.
+The design is a domain-partitioned modular monolith: bounded contexts as top-level packages, hexagonal (ports and adapters) inside each, with boundaries enforced but not distributed. No context is split into a separately deployable service in the first release. The first contexts the application needs are decided in [ADR-0005](docs/adr/0005-bounded-contexts.md): League, Games and Accounts, with provider acquisition as a technical capability beside them.
 
 Two client applications will serve the two interactive surfaces, each chosen against its own surface: a public application, reachable without signing in, whose pages render and are cacheable with no session attached to them, and an administrative application that serves the Administrator, one person, behind a login.
 
 | Part | Technology | In the repository |
 |---|---|---|
 | Backend | Java 25 with Spring Boot 4, built with Gradle | Yes, as a foundation: the application context starts and Flyway runs in its startup, requests are denied unless a rule permits them, and logs are structured JSON with a correlation ID; none of the specified behaviour yet |
-| Database | PostgreSQL | In tests only: PostgreSQL 16 in a container that Testcontainers starts; Flyway runs against it, with no migrations yet |
+| Database | PostgreSQL | In tests only: PostgreSQL 16 in a container that Testcontainers starts; Flyway applies the League schema (V1) against it |
 | Identity | Keycloak, with OAuth 2.1 and PKCE | Not yet |
 | Public application | Next.js with React and TypeScript | Not yet |
 | Administrative application | Angular with TypeScript | Not yet |
@@ -54,6 +54,7 @@ A GitHub Actions workflow runs the same build on every pull request, and a pull 
   - [ADR-0002: Additive and driving architectural characteristics](docs/adr/0002-additive-and-driving-architectural-characteristics.md)
   - [ADR-0003: Modular monolith architecture](docs/adr/0003-modular-monolith-architecture.md)
   - [ADR-0004: Two client applications, chosen against their own constraints](docs/adr/0004-client-architecture.md)
+  - [ADR-0005: Bounded contexts](docs/adr/0005-bounded-contexts.md)
 
 Further documentation is published with the work that needs it and listed here as it lands.
 

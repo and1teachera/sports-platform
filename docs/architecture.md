@@ -3,8 +3,8 @@
 > ### Status
 >
 > This document describes the designed architecture. No application behaviour exists yet: what follows
-> is decided, not built, and it covers only what is settled. Which bounded contexts the application
-> will hold is not yet decided, so this document names none.
+> is decided, not built, and it covers only what is settled. The first bounded contexts the
+> application needs are decided in [ADR-0005, Bounded contexts](adr/0005-bounded-contexts.md).
 
 ## Driving architectural characteristics
 

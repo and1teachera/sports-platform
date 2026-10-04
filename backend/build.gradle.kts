@@ -17,4 +17,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.5.1")
 }

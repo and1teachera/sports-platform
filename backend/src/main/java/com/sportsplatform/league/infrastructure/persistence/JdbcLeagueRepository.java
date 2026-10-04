@@ -48,4 +48,12 @@ public class JdbcLeagueRepository implements LeagueRepository {
                     .update();
         }
     }
+
+    @Override
+    public void updateDisplayName(LeagueId id, String name) {
+        jdbc.sql("update league set name = ? where id = ?")
+                .param(name)
+                .param(id.value())
+                .update();
+    }
 }

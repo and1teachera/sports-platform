@@ -1,8 +1,8 @@
 package com.sportsplatform.config;
 
 import com.sportsplatform.league.application.ApplyPreparedStructure;
+import com.sportsplatform.league.application.Clock;
 import com.sportsplatform.league.domain.ClubRepository;
-import com.sportsplatform.league.domain.Clock;
 import com.sportsplatform.league.domain.CorrelationReApplier;
 import com.sportsplatform.league.domain.LeagueRepository;
 import com.sportsplatform.league.domain.RefusalRecordStore;

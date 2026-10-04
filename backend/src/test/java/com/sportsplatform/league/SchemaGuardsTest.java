@@ -33,7 +33,7 @@ class SchemaGuardsTest extends DatabaseCleanedIntegrationTest {
     @Test
     void shouldRejectParticipationWithoutPlacement() {
         jdbc.sql("insert into league (id, name) values ('nba', 'NBA')").update();
-        jdbc.sql("insert into season_structure (league_id, season_id) values ('nba', '2026-2027')").update();
+        jdbc.sql("insert into season_structure (league_id, season_id, fingerprint) values ('nba', '2026-2027', 'test-fp')").update();
         jdbc.sql("insert into club (id, league_id, name) values ('c-1', 'nba', 'Club 1')").update();
         jdbc.sql("""
                 insert into competition (league_id, season_id, id, name)
@@ -54,7 +54,7 @@ class SchemaGuardsTest extends DatabaseCleanedIntegrationTest {
     @Test
     void shouldRejectCupGroupFromAnotherCompetition() {
         jdbc.sql("insert into league (id, name) values ('nba', 'NBA')").update();
-        jdbc.sql("insert into season_structure (league_id, season_id) values ('nba', '2026-2027')").update();
+        jdbc.sql("insert into season_structure (league_id, season_id, fingerprint) values ('nba', '2026-2027', 'test-fp')").update();
         jdbc.sql("insert into club (id, league_id, name) values ('c-1', 'nba', 'Club 1')").update();
         jdbc.sql("""
                 insert into competition (league_id, season_id, id, name)

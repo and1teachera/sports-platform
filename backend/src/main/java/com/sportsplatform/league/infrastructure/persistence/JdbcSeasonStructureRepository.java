@@ -55,12 +55,6 @@ public class JdbcSeasonStructureRepository implements SeasonStructureRepository 
 
     @Override
     @Transactional
-    public void save(SeasonStructure structure) {
-        insertStructureRows(structure, null);
-    }
-
-    @Override
-    @Transactional
     public void save(SeasonStructure structure, Fingerprint fingerprint) {
         insertStructureRows(structure, java.util.Objects.requireNonNull(fingerprint, "fingerprint"));
     }
@@ -84,7 +78,7 @@ public class JdbcSeasonStructureRepository implements SeasonStructureRepository 
 
         jdbc.sql("insert into season_structure (league_id, season_id, fingerprint) values (?, ?, ?)")
                 .param(leagueId).param(seasonId)
-                .param(fingerprint == null ? null : fingerprint.value())
+                .param(fingerprint.value())
                 .update();
 
         for (Competition competition : structure.competitions()) {

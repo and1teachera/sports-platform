@@ -1,6 +1,6 @@
 package com.sportsplatform.league.infrastructure.persistence;
 
-import com.sportsplatform.league.domain.Clock;
+import com.sportsplatform.league.application.Clock;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

@@ -47,12 +47,12 @@ class BootstrapSmokeTest extends AbstractIntegrationTest {
 
         // Spring Boot's FlywayMigrationInitializer ran migrate() during application startup.
         // Re-run validate() here to assert the Flyway configuration is coherent against the
-        // live database and the (empty) classpath migration set.
+        // live database and the classpath migration set.
         flyway.validate();
 
-        // Resolved and applied migration counts are both zero; the point is
-        // that Flyway inspected the migration set without throwing.
-        assertThat(flyway.info().all()).isEmpty();
-        assertThat(flyway.info().applied()).isEmpty();
+        // The migration set is non-empty from V1 onwards; Flyway resolved and applied the
+        // committed migrations without throwing.
+        assertThat(flyway.info().all()).isNotEmpty();
+        assertThat(flyway.info().applied()).isNotEmpty();
     }
 }

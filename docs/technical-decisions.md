@@ -4,8 +4,10 @@
 >
 > This document is the technical baseline that implementation must respect: the technology,
 > protocol and deployment choices already made. The repository holds the build baseline below and a
-> backend with no application behaviour yet. Every other entry states a
-> decision in force, and the software that follows it does not exist. The document says what
+> backend with none of the behaviour the [requirements](requirements.md) describe. Of the other
+> entries, the deny-by-default authorization rule, structured logging with correlation IDs and the
+> health endpoint under observability are in place; every remaining entry states a decision in
+> force whose software does not exist yet. The document says what
 > applies; the reason for an architecturally significant choice is in its decision record, linked
 > where one is published. Decisions that concern data collection, resilience, operations or a
 > particular feature are published with the work that needs them.
@@ -30,7 +32,7 @@
 ## Observability
 
 - **Structured logging.** Application logging is structured JSON with correlation IDs, from the start.
-- **Metrics collection and dashboards deferred.** A metrics collector and a dashboard stack are not part of the first release, and each returns with its own decision record when the need is real, as [ADR-0002, Additive and driving architectural characteristics](adr/0002-additive-and-driving-architectural-characteristics.md) sets out. The backend exposes health and metrics endpoints with a metrics registry from the start; that endpoint is the seam that keeps the deferral a configuration change rather than a rewrite.
+- **Metrics collection and dashboards deferred.** A metrics collector and a dashboard stack are not part of the first release, and each returns with its own decision record when the need is real, as [ADR-0002, Additive and driving architectural characteristics](adr/0002-additive-and-driving-architectural-characteristics.md) sets out. The backend has a metrics registry from the start. Its health endpoint is open to anyone, and its metrics and info endpoints are denied to anonymous callers until a concrete consumer needs them; the metrics endpoint is the seam that keeps the deferral a configuration change rather than a rewrite.
 
 ## Deployment composition
 
@@ -43,4 +45,4 @@
 - **Application framework.** Spring Boot 4. The exact release is set in the build files.
 - **Build tool and layout.** Gradle with the Kotlin DSL: one build at the root of the repository, in which the backend is one Gradle module, `backend`. The Gradle wrapper is committed, so the build runs with `./gradlew` and needs no Gradle installation.
 - **Database migrations.** Flyway, as versioned SQL migrations applied at application startup. Spring Boot runs Flyway as part of its own startup, and the backend includes Flyway's PostgreSQL support. The migration set is empty, so a startup finds nothing to apply.
-- **Tests.** JUnit Jupiter, as Spring Boot's test starter brings it. Tests that need a database run against PostgreSQL 16 in Testcontainers, which needs a container runtime on the machine that runs them. Testcontainers is taken from the Spring Boot dependency management and is not versioned separately. A smoke test starts the whole application context against such a database and checks that Flyway is wired into the startup.
+- **Tests.** JUnit Jupiter, as Spring Boot's test starter brings it. Tests that need a database run against PostgreSQL 16 in Testcontainers, which needs a container runtime on the machine that runs them. Testcontainers is taken from the Spring Boot dependency management and is not versioned separately. A smoke test starts the whole application context against such a database and checks that Flyway is wired into the startup. Integration tests share one PostgreSQL container across test classes. The build and its tests run on every pull request.

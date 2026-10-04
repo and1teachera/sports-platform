@@ -30,11 +30,4 @@ public class JdbcRefusalRecordStore implements RefusalRecordStore {
                 .param(Timestamp.from(record.detectedAt()))
                 .update();
     }
-
-    @Override
-    public long count() {
-        return jdbc.sql("select count(*) from refusal_record")
-                .query(Long.class)
-                .single();
-    }
 }

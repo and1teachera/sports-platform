@@ -146,7 +146,7 @@ public class ArchitectureTests {
             .should().haveNameMatching("(?i).*(provider|external).*")
             .because("ADR-0006 rule No provider reference");
 
-    // Rule 6 — Application layer. Subject (..league.application..) is empty at CP6 by design.
+    // Rule 6 — Application layer. Non-empty subject from the apply use case onward.
     @ArchTest
     static final ArchRule application_layer_depends_on_neither_web_nor_infrastructure = noClasses()
             .that().resideInAPackage(LEAGUE_APPLICATION)
@@ -157,8 +157,7 @@ public class ArchitectureTests {
                     "org.springframework.jdbc..",
                     "org.springframework.transaction.."
             )
-            .because("ADR-0006 rule Application layer")
-            .allowEmptyShould(true);
+            .because("ADR-0006 rule Application layer");
 
     // Rule 7 — Persistence adapters.
     @ArchTest

@@ -8,6 +8,7 @@ import com.sportsplatform.league.domain.Conference;
 import com.sportsplatform.league.domain.CupGroup;
 import com.sportsplatform.league.domain.CupGroupId;
 import com.sportsplatform.league.domain.Division;
+import com.sportsplatform.league.domain.Fingerprint;
 import com.sportsplatform.league.domain.LeagueId;
 import com.sportsplatform.league.domain.Phase;
 import com.sportsplatform.league.domain.PhaseId;
@@ -55,11 +56,36 @@ public class JdbcSeasonStructureRepository implements SeasonStructureRepository 
     @Override
     @Transactional
     public void save(SeasonStructure structure) {
+        insertStructureRows(structure, null);
+    }
+
+    @Override
+    @Transactional
+    public void save(SeasonStructure structure, Fingerprint fingerprint) {
+        insertStructureRows(structure, java.util.Objects.requireNonNull(fingerprint, "fingerprint"));
+    }
+
+    @Override
+    public Optional<Fingerprint> findFingerprint(SeasonStructureId id) {
+        return jdbc.sql(
+                        "select fingerprint from season_structure where league_id = ? and season_id = ?")
+                .param(id.league().value()).param(id.season().value())
+                .query((rs, rowNum) -> {
+                    String value = rs.getString("fingerprint");
+                    return value == null ? null : new Fingerprint(value);
+                })
+                .optional()
+                .flatMap(Optional::ofNullable);
+    }
+
+    private void insertStructureRows(SeasonStructure structure, Fingerprint fingerprint) {
         String leagueId = structure.league().value();
         String seasonId = structure.season().value();
 
-        jdbc.sql("insert into season_structure (league_id, season_id) values (?, ?)")
-                .param(leagueId).param(seasonId).update();
+        jdbc.sql("insert into season_structure (league_id, season_id, fingerprint) values (?, ?, ?)")
+                .param(leagueId).param(seasonId)
+                .param(fingerprint == null ? null : fingerprint.value())
+                .update();
 
         for (Competition competition : structure.competitions()) {
             jdbc.sql("insert into competition (league_id, season_id, id, name) values (?, ?, ?, ?)")

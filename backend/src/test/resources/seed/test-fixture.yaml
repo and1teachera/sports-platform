@@ -1,0 +1,63 @@
+league:
+  id: nba
+  name: "National Basketball Association"
+
+season:
+  id: "2026-2027"
+
+clubs:
+  - id: club-001
+    name: "Boston Celtics"
+  - id: club-006
+    name: "Chicago Bulls"
+  - id: club-021
+    name: "Golden State Warriors"
+
+competitions:
+  - id: regular-season-2026-2027
+    name: Regular Season
+    phases:
+      - id: regular-season-2026-2027-phase-1
+        name: Regular Season
+        ordinal: 1
+  - id: nba-cup-2026
+    name: NBA Cup
+    phases:
+      - id: nba-cup-2026-group-play
+        name: Group Play
+        ordinal: 1
+        groups:
+          - id: east-group-a
+            name: East Group A
+          - id: east-group-c
+            name: East Group C
+          - id: west-group-c
+            name: West Group C
+
+placements:
+  - club: club-001
+    conference: "Eastern Conference"
+    division: "Atlantic"
+  - club: club-006
+    conference: "Eastern Conference"
+    division: "Central"
+  - club: club-021
+    conference: "Western Conference"
+    division: "Pacific"
+
+participations:
+  - club: club-001
+    competition: regular-season-2026-2027
+  - club: club-006
+    competition: regular-season-2026-2027
+  - club: club-021
+    competition: regular-season-2026-2027
+  - club: club-001
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-006
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-021
+    competition: nba-cup-2026
+    cupGroup: west-group-c

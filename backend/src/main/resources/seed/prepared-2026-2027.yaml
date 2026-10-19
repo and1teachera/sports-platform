@@ -1,0 +1,374 @@
+# Prepared structure for the 2026-2027 NBA season, in the shape PreparedStructureLoader reads.
+#
+# Conferences, divisions and Cup groups follow the NBA's published 2026-27 league alignment
+# and its NBA Cup 2026 group announcement, checked on 2026-09-30. Club IDs are owned by the
+# platform, stay stable across seasons and are not provider identifiers. The Play-In
+# Tournament and the Playoffs are listed without participations: no club takes part in
+# them until it qualifies.
+
+league:
+  id: nba
+  name: "National Basketball Association"
+
+season:
+  id: "2026-2027"
+
+clubs:
+  - id: club-001
+    name: "Boston Celtics"
+  - id: club-002
+    name: "Brooklyn Nets"
+  - id: club-003
+    name: "New York Knicks"
+  - id: club-004
+    name: "Philadelphia 76ers"
+  - id: club-005
+    name: "Toronto Raptors"
+  - id: club-006
+    name: "Chicago Bulls"
+  - id: club-007
+    name: "Cleveland Cavaliers"
+  - id: club-008
+    name: "Detroit Pistons"
+  - id: club-009
+    name: "Indiana Pacers"
+  - id: club-010
+    name: "Milwaukee Bucks"
+  - id: club-011
+    name: "Atlanta Hawks"
+  - id: club-012
+    name: "Charlotte Hornets"
+  - id: club-013
+    name: "Miami Heat"
+  - id: club-014
+    name: "Orlando Magic"
+  - id: club-015
+    name: "Washington Wizards"
+  - id: club-016
+    name: "Denver Nuggets"
+  - id: club-017
+    name: "Minnesota Timberwolves"
+  - id: club-018
+    name: "Oklahoma City Thunder"
+  - id: club-019
+    name: "Portland Trail Blazers"
+  - id: club-020
+    name: "Utah Jazz"
+  - id: club-021
+    name: "Golden State Warriors"
+  - id: club-022
+    name: "LA Clippers"
+  - id: club-023
+    name: "Los Angeles Lakers"
+  - id: club-024
+    name: "Phoenix Suns"
+  - id: club-025
+    name: "Sacramento Kings"
+  - id: club-026
+    name: "Dallas Mavericks"
+  - id: club-027
+    name: "Houston Rockets"
+  - id: club-028
+    name: "Memphis Grizzlies"
+  - id: club-029
+    name: "New Orleans Pelicans"
+  - id: club-030
+    name: "San Antonio Spurs"
+
+competitions:
+  - id: regular-season-2026-2027
+    name: Regular Season
+    phases:
+      - id: regular-season-2026-2027-phase-1
+        name: Regular Season
+        ordinal: 1
+  - id: nba-cup-2026
+    name: NBA Cup
+    phases:
+      - id: nba-cup-2026-group-play
+        name: Group Play
+        ordinal: 1
+        groups:
+          - id: east-group-a
+            name: East Group A
+          - id: east-group-b
+            name: East Group B
+          - id: east-group-c
+            name: East Group C
+          - id: west-group-a
+            name: West Group A
+          - id: west-group-b
+            name: West Group B
+          - id: west-group-c
+            name: West Group C
+      - id: nba-cup-2026-knockout-rounds
+        name: Knockout Rounds
+        ordinal: 2
+  - id: play-in-2027
+    name: Play-In Tournament
+    phases:
+      - id: play-in-2027-opening-stage
+        name: Opening Stage
+        ordinal: 1
+      - id: play-in-2027-final-stage
+        name: Final Stage
+        ordinal: 2
+  - id: playoffs-2027
+    name: NBA Playoffs
+    phases:
+      - id: playoffs-2027-first-round
+        name: First Round
+        ordinal: 1
+      - id: playoffs-2027-conference-semifinals
+        name: Conference Semifinals
+        ordinal: 2
+      - id: playoffs-2027-conference-finals
+        name: Conference Finals
+        ordinal: 3
+      - id: playoffs-2027-nba-finals
+        name: NBA Finals
+        ordinal: 4
+
+placements:
+  - club: club-001
+    conference: "Eastern Conference"
+    division: "Atlantic"
+  - club: club-002
+    conference: "Eastern Conference"
+    division: "Atlantic"
+  - club: club-003
+    conference: "Eastern Conference"
+    division: "Atlantic"
+  - club: club-004
+    conference: "Eastern Conference"
+    division: "Atlantic"
+  - club: club-005
+    conference: "Eastern Conference"
+    division: "Atlantic"
+  - club: club-006
+    conference: "Eastern Conference"
+    division: "Central"
+  - club: club-007
+    conference: "Eastern Conference"
+    division: "Central"
+  - club: club-008
+    conference: "Eastern Conference"
+    division: "Central"
+  - club: club-009
+    conference: "Eastern Conference"
+    division: "Central"
+  - club: club-010
+    conference: "Eastern Conference"
+    division: "Central"
+  - club: club-011
+    conference: "Eastern Conference"
+    division: "Southeast"
+  - club: club-012
+    conference: "Eastern Conference"
+    division: "Southeast"
+  - club: club-013
+    conference: "Eastern Conference"
+    division: "Southeast"
+  - club: club-014
+    conference: "Eastern Conference"
+    division: "Southeast"
+  - club: club-015
+    conference: "Eastern Conference"
+    division: "Southeast"
+  - club: club-016
+    conference: "Western Conference"
+    division: "Northwest"
+  - club: club-017
+    conference: "Western Conference"
+    division: "Northwest"
+  - club: club-018
+    conference: "Western Conference"
+    division: "Northwest"
+  - club: club-019
+    conference: "Western Conference"
+    division: "Northwest"
+  - club: club-020
+    conference: "Western Conference"
+    division: "Northwest"
+  - club: club-021
+    conference: "Western Conference"
+    division: "Pacific"
+  - club: club-022
+    conference: "Western Conference"
+    division: "Pacific"
+  - club: club-023
+    conference: "Western Conference"
+    division: "Pacific"
+  - club: club-024
+    conference: "Western Conference"
+    division: "Pacific"
+  - club: club-025
+    conference: "Western Conference"
+    division: "Pacific"
+  - club: club-026
+    conference: "Western Conference"
+    division: "Southwest"
+  - club: club-027
+    conference: "Western Conference"
+    division: "Southwest"
+  - club: club-028
+    conference: "Western Conference"
+    division: "Southwest"
+  - club: club-029
+    conference: "Western Conference"
+    division: "Southwest"
+  - club: club-030
+    conference: "Western Conference"
+    division: "Southwest"
+
+participations:
+  - club: club-001
+    competition: regular-season-2026-2027
+  - club: club-002
+    competition: regular-season-2026-2027
+  - club: club-003
+    competition: regular-season-2026-2027
+  - club: club-004
+    competition: regular-season-2026-2027
+  - club: club-005
+    competition: regular-season-2026-2027
+  - club: club-006
+    competition: regular-season-2026-2027
+  - club: club-007
+    competition: regular-season-2026-2027
+  - club: club-008
+    competition: regular-season-2026-2027
+  - club: club-009
+    competition: regular-season-2026-2027
+  - club: club-010
+    competition: regular-season-2026-2027
+  - club: club-011
+    competition: regular-season-2026-2027
+  - club: club-012
+    competition: regular-season-2026-2027
+  - club: club-013
+    competition: regular-season-2026-2027
+  - club: club-014
+    competition: regular-season-2026-2027
+  - club: club-015
+    competition: regular-season-2026-2027
+  - club: club-016
+    competition: regular-season-2026-2027
+  - club: club-017
+    competition: regular-season-2026-2027
+  - club: club-018
+    competition: regular-season-2026-2027
+  - club: club-019
+    competition: regular-season-2026-2027
+  - club: club-020
+    competition: regular-season-2026-2027
+  - club: club-021
+    competition: regular-season-2026-2027
+  - club: club-022
+    competition: regular-season-2026-2027
+  - club: club-023
+    competition: regular-season-2026-2027
+  - club: club-024
+    competition: regular-season-2026-2027
+  - club: club-025
+    competition: regular-season-2026-2027
+  - club: club-026
+    competition: regular-season-2026-2027
+  - club: club-027
+    competition: regular-season-2026-2027
+  - club: club-028
+    competition: regular-season-2026-2027
+  - club: club-029
+    competition: regular-season-2026-2027
+  - club: club-030
+    competition: regular-season-2026-2027
+  - club: club-001
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-002
+    competition: nba-cup-2026
+    cupGroup: east-group-a
+  - club: club-003
+    competition: nba-cup-2026
+    cupGroup: east-group-b
+  - club: club-004
+    competition: nba-cup-2026
+    cupGroup: east-group-b
+  - club: club-005
+    competition: nba-cup-2026
+    cupGroup: east-group-a
+  - club: club-006
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-007
+    competition: nba-cup-2026
+    cupGroup: east-group-b
+  - club: club-008
+    competition: nba-cup-2026
+    cupGroup: east-group-a
+  - club: club-009
+    competition: nba-cup-2026
+    cupGroup: east-group-b
+  - club: club-010
+    competition: nba-cup-2026
+    cupGroup: east-group-a
+  - club: club-011
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-012
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-013
+    competition: nba-cup-2026
+    cupGroup: east-group-b
+  - club: club-014
+    competition: nba-cup-2026
+    cupGroup: east-group-a
+  - club: club-015
+    competition: nba-cup-2026
+    cupGroup: east-group-c
+  - club: club-016
+    competition: nba-cup-2026
+    cupGroup: west-group-a
+  - club: club-017
+    competition: nba-cup-2026
+    cupGroup: west-group-b
+  - club: club-018
+    competition: nba-cup-2026
+    cupGroup: west-group-b
+  - club: club-019
+    competition: nba-cup-2026
+    cupGroup: west-group-c
+  - club: club-020
+    competition: nba-cup-2026
+    cupGroup: west-group-a
+  - club: club-021
+    competition: nba-cup-2026
+    cupGroup: west-group-c
+  - club: club-022
+    competition: nba-cup-2026
+    cupGroup: west-group-b
+  - club: club-023
+    competition: nba-cup-2026
+    cupGroup: west-group-c
+  - club: club-024
+    competition: nba-cup-2026
+    cupGroup: west-group-a
+  - club: club-025
+    competition: nba-cup-2026
+    cupGroup: west-group-c
+  - club: club-026
+    competition: nba-cup-2026
+    cupGroup: west-group-a
+  - club: club-027
+    competition: nba-cup-2026
+    cupGroup: west-group-a
+  - club: club-028
+    competition: nba-cup-2026
+    cupGroup: west-group-b
+  - club: club-029
+    competition: nba-cup-2026
+    cupGroup: west-group-b
+  - club: club-030
+    competition: nba-cup-2026
+    cupGroup: west-group-c

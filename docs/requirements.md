@@ -3,7 +3,7 @@
 > ### Status
 >
 > This document states the behaviour the published specification currently requires from the
-> system. No behaviour a reader can see exists yet: every requirement here is decided, and the [README](../README.md) says what is built. It holds
+> system. Every requirement here is decided, and the [README](../README.md) says what is built. It holds
 > the foundational requirements that make the [system description](system-description.md)
 > precise; further requirements are published with the work that implements them, under the same
 > headings.

@@ -4,13 +4,14 @@
 >
 > This document is the technical baseline that implementation must respect: the technology,
 > protocol and deployment choices already made. The repository holds the build baseline below and a
-> backend with no behaviour a reader can see. Of the other
+> backend that serves the current season's clubs from the platform's own store. Of the other
 > entries, the deny-by-default authorization rule, structured logging with correlation IDs and the
-> health endpoint under observability are in place; every remaining entry states a decision in
-> force whose software does not exist yet. The document says what
-> applies; the reason for an architecturally significant choice is in its decision record, linked
-> where one is published. Decisions that concern data collection, resilience, operations or a
-> particular feature are published with the work that needs them.
+> health endpoint under observability are in place; the clubs endpoint does not yet use the
+> response envelope or the error format under API conventions; every remaining entry states a
+> decision in force whose software does not exist yet. The document says what applies; the reason
+> for an architecturally significant choice is in its decision record, linked where one is
+> published. Decisions that concern data collection, resilience, operations or a particular
+> feature are published with the work that needs them.
 
 ## Runtime and persistence
 
